@@ -1,5 +1,0 @@
-SELECT TOP (1000) [ID]
-      ,[Nombre_sucursal]
-      ,[Ciudad]
-      ,[Cantidad_ventas_anual]
-  FROM [Datos_Generales].[dbo].[sucursal]
