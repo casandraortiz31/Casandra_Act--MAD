@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carrito de compras | TiendaSara</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <style>
+    body { background-color: #f8f9fa; }
+    img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
+    table { background: white; border-radius: 10px; overflow: hidden; }
+    td, th { vertical-align: middle !important; }
+  </style>
+</head>
+<body>
+  <div class="container mt-5">
+    <h2 class="mb-4 text-center">🛒 Tu carrito de compras</h2>
+
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle text-center">
+        <thead class="table-dark">
+          <tr>
+            <th>Imagen</th>
+            <th>Producto</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Subtotal</th>
+            <th>Eliminar</th>
+          </tr>
+        </thead>
+        <tbody id="carrito-body"></tbody>
+      </table>
+    </div>
+
+    <div class="text-end">
+      <h4>Subtotal: $<span id="subtotal">0</span></h4>
+      <h5>Impuestos (16%): $<span id="impuestos">0</span></h5>
+      <h3>Total: $<span id="total">0</span></h3>
+    </div>
+
+    <div class="d-flex justify-content-between mt-4">
+      <a href="galeria.html" class="btn btn-outline-primary">⬅ Seguir comprando</a>
+      <button class="btn btn-success" id="btnPagar">💳 Proceder al pago</button>
+    </div>
+  </div>
+
+<script>
+function mostrarCarrito() {
+  const tbody = document.getElementById('carrito-body');
+  let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+  tbody.innerHTML = "";
+
+  let subtotal = 0;
+
+  carrito.forEach((p, index) => {
+    const sub = p.precio * p.cantidad;
+    subtotal += sub;
+
+    tbody.innerHTML += `
+      <tr>
+        <td><img src="${p.imagen}" alt="${p.nombre}"></td>
+        <td>${p.nombre}</td>
+        <td>$${p.precio}</td>
+        <td>
+          <input type="number" min="1" value="${p.cantidad}" class="form-control cantidad" data-index="${index}">
+        </td>
+        <td>$${sub}</td>
+        <td><button class="btn btn-danger btn-sm eliminar" data-index="${index}">🗑</button></td>
+      </tr>`;
+  });
+
+  const impuestos = subtotal * 0.16;
+  const total = subtotal + impuestos;
+
+  document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+  document.getElementById('impuestos').textContent = impuestos.toFixed(2);
+  document.getElementById('total').textContent = total.toFixed(2);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  mostrarCarrito();
+
+  document.getElementById('carrito-body').addEventListener('click', (e) => {
+    if (e.target.classList.contains('eliminar')) {
+      const index = e.target.dataset.index;
+      let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+      carrito.splice(index, 1);
+      localStorage.setItem('carrito', JSON.stringify(carrito));
+      mostrarCarrito();
+    }
+  });
+
+  document.getElementById('carrito-body').addEventListener('change', (e) => {
+    if (e.target.classList.contains('cantidad')) {
+      const index = e.target.dataset.index;
+      let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+      carrito[index].cantidad = parseInt(e.target.value);
+      localStorage.setItem('carrito', JSON.stringify(carrito));
+      mostrarCarrito();
+    }
+  });
+
+  document.getElementById('btnPagar').addEventListener('click', () => {
+    alert("💳 ¡Gracias por tu compra! Tu pedido ha sido procesado.");
+    localStorage.removeItem('carrito');
+    window.location.href = "index.html";
+  });
+});
+</script>
+</body>
+</html>

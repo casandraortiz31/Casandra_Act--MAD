@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Categoria | TiendaSara</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <style>
+    body { background-color: #f8f9fa; }
+    .producto { border: 1px solid #ddd; border-radius: 10px; padding: 10px; background: #fff; text-align: center; position: relative; transition: transform 0.2s; }
+    .producto:hover { transform: scale(1.03); }
+    .etiqueta { position: absolute; top: 8px; left: 8px; background-color: crimson; color: white; padding: 4px 6px; font-size: 12px; border-radius: 4px; }
+    .vista-lista .producto { display: flex; align-items: center; text-align: left; }
+    .vista-lista img { width: 150px; height: 150px; margin-right: 15px; object-fit: cover; }
+    .vista-grid img { width: 100%; height: 200px; object-fit: cover; }
+    .filtros label { font-weight: 600; }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg bg-dark navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">TiendaSara</a>
+    </div>
+  </nav>
+
+  <div class="container mt-4">
+    <h2 id="titulo-categoria" class="mb-4 text-center">Todos los productos</h2>
+
+    <div class="row">
+      <!-- FILTROS -->
+      <aside class="col-md-3 mb-4 filtros">
+        <h5>Filtros</h5>
+        <div class="mb-3">
+          <label>Categoria:</label>
+          <select id="filtrocategoria" class="form-select">
+            <option value="">Todas</option>
+            <option value="Ropa">Ropa</option>
+            <option value="joyería">joyería</option>
+            <option value="Electrónica">Electrónica</option>
+            <option value="Muebles">Muebles</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label>Marca:</label>
+          <select id="filtromarca" class="form-select">
+            <option value="">Todas</option>
+            <option value="Zara">Zara</option>
+            <option value="Samsung">Samsung</option>
+            <option value="IKEA">IKEA</option>
+            <option value="Samhara">Samhara</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label>Precio máximo:</label>
+          <input type="range" class="form-range" min="100" max="10000" value="10000" id="filtroPrecio">
+          <p>Hasta: $<span id="precioMax">10000</span></p>
+        </div>
+        <div class="mb-3">
+          <label>Color:</label>
+          <select id="filtrocolor" class="form-select">
+            <option value="">Todos</option>
+            <option value="Cafe">Cafe</option>
+            <option value="Negro">Negro</option>
+            <option value="Blanco">Blanco</option>
+            <option value="Dorado">Dorado</option>
+            <option value="Gris">Gris</option>
+            <option value="Marron">Marron</option>
+            <option value="Crema">Crema</option>
+            <option value="Amarillo">Amarillo</option>
+            <option value="Naranja">Naranja</option>
+            <option value="Durazno">Durazno</option>
+            <option value="Madera">Madera</option>
+          </select>
+        </div>
+      </aside>
+
+      <!-- LISTADO DE PRODUCTOS -->
+      <section class="col-md-9">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <label for="ordenar" class="form-label me-2">Ordenar por:</label>
+            <select id="ordenar" class="form-select d-inline-block" style="width:auto;">
+              <option value="relevancia">Relevancia</option>
+              <option value="precioAsc">Precio (menor a mayor)</option>
+              <option value="precioDesc">Precio (mayor a menor)</option>
+              <option value="popularidad">Popularidad</option>
+            </select>
+          </div>
+          <div>
+            <button id="btnGrid" class="btn btn-outline-primary btn-sm">🖼️ Galería</button>
+            <button id="btnLista" class="btn btn-outline-secondary btn-sm">📋 Lista</button>
+          </div>
+        </div>
+
+        <div id="contenedorProductos" class="row g-3 vista-grid"></div>
+
+        <!-- PAGINACIÓN -->
+        <div class="text-center mt-4">
+          <button class="btn btn-primary" id="btnVerMas">Ver más productos</button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+ <script>
+const params = new URLSearchParams(window.location.search);
+const categoria = params.get("cat");
+if(categoria) document.getElementById("titulo-categoria").textContent = categoria.toUpperCase();
+
+// Productos simulados
+const productos = [
+{ nombre: "Camiseta", categoria: "Ropa", marca: "Zara", color: "Naranja", precio: 250, popularidad: 90, etiqueta: "Nuevo", imagen: "img/Blusa1.jpg" }, 
+{ nombre: "Blusa", categoria: "Ropa", marca: "Zara", color: "Blanca", precio: 400, popularidad: 60, etiqueta: "Descuento", imagen: "img/Blusa2.jpg" },
+{ nombre: "Chamarra", categoria: "Ropa", marca: "Zara", color: "Negro", precio: 350, popularidad: 80, etiqueta: "Popular", imagen: "img/Chamarra1.jpg" }, 
+{ nombre: "Chamarra", categoria: "Ropa", marca: "Zara", color: "Cafe", precio: 800, popularidad: 95, etiqueta: "Popular", imagen: "img/Chamarra2.jpg" },
+{ nombre: "Chamarra", categoria: "Ropa", marca: "Zara", color: "Negro", precio: 1200, popularidad: 70, etiqueta: "Nuevo", imagen: "img/Chamarra3.jpg" },
+{ nombre: "Teléfono", categoria: "Electrónica", marca: "Samsung", color: "Negro", precio: 5000, popularidad: 100, etiqueta: "Nuevo", imagen: "img/Electronica1.jpg" }, 
+{ nombre: "Audífonos", categoria: "Electrónica", marca: "Samsung", color: "Negro", precio: 700, popularidad: 85, etiqueta: "Descuento", imagen: "img/Electronica4.jpg" }, 
+{ nombre: "Microfono USB", categoria: "Electrónica", marca: "Samsung", color: "Gris Oscuro", precio: 9500, popularidad: 90, etiqueta: "Popular", imagen: "img/Electronica7.jpg" }, 
+{ nombre: "iPod", categoria: "Electrónica", marca: "Samsung", color: "Gris", precio: 950, popularidad: 60, etiqueta: "Descuento", imagen: "img/Electronica6.jpg" }, 
+{ nombre: "Camara", categoria: "Electrónica", marca: "Samsung", color: "Negro", precio: 1500, popularidad: 75, etiqueta: "Nuevo", imagen: "img/Electronica2.jpg" }, 
+{ nombre: "Lamapara", categoria: "Electrónica", marca: "Samsung", color: "Dorado", precio: 1800, popularidad: 80, etiqueta: "Popular", imagen: "img/Electronica5.jpg" }, 
+{ nombre: "Blusa", categoria: "Ropa", marca: "Zara", color: "Blanco", precio: 250, popularidad: 90, etiqueta: "Nuevo", imagen: "img/Blusa3.jpg" }, 
+{ nombre: "Pantalón", categoria: "Ropa", marca: "Zara", color: "Negro", precio: 400, popularidad: 60, etiqueta: "Descuento", imagen: "img/Pantalon1.jpg" }, 
+{ nombre: "Pantalón", categoria: "Ropa", marca: "Zara", color: "Durazno", precio: 350, popularidad: 80, etiqueta: "Popular", imagen: "img/Pantalon2.jpg" }, 
+{ nombre: "Pantalón", categoria: "Ropa", marca: "Zara", color: "Crema", precio: 800, popularidad: 95, etiqueta: "Popular", imagen: "img/Pantalon3.jpg" }, 
+{ nombre: "Collar", categoria: "joyería", marca: "Samhara", color: "Dorado", precio: 1200, popularidad: 70, etiqueta: "Nuevo", imagen: "img/joyeria1.jpg" }, 
+{ nombre: "Aretes", categoria: "joyería", marca: "Samhara", color: "Turquesa", precio: 5000, popularidad: 100, etiqueta: "Nuevo", imagen: "img/joyeria2.jpg" }, 
+{ nombre: "Pulseras", categoria: "joyería", marca: "Samhara", color: "Cafe", precio: 700, popularidad: 85, etiqueta: "Descuento", imagen: "img/joyeria3.jpg" }, 
+{ nombre: "Aretes", categoria: "joyería", marca: "Samhara", color: "Blanco", precio: 1500, popularidad: 90, etiqueta: "Popular", imagen: "img/joyeria4.jpg" },
+{ nombre: "Collar", categoria: "joyería", marca: "Samhara", color: "Dorado", precio: 950, popularidad: 60, etiqueta: "Descuento", imagen: "img/joyeria5.jpg" },
+{ nombre: "Pulsera", categoria: "joyería", marca: "Samhara", color: "Dorado", precio: 1500, popularidad: 75, etiqueta: "Nuevo", imagen: "img/joyeria6.jpg" }, 
+{ nombre: "Sala", categoria: "Muebles", marca: "IKEA", color: "Marrón", precio: 1800, popularidad: 80, etiqueta: "Popular", imagen: "img/Mueble1.jpg" }, 
+{ nombre: "Sillon", categoria: "Muebles", marca: "IKEA", color: "Amarillo", precio: 1800, popularidad: 80, etiqueta: "Popular", imagen: "img/Mueble2.jpg" }, 
+{ nombre: "Sillon", categoria: "Muebles", marca: "IKEA", color: "Naranja", precio: 1800, popularidad: 80, etiqueta: "Popular", imagen: "img/Mueble3.jpg" }, 
+{ nombre: "Sala", categoria: "Muebles", marca: "IKEA", color: "Blanco", precio: 1800, popularidad: 80, etiqueta: "Popular", imagen: "img/Mueble4.jpg" }, 
+{ nombre: "Silla", categoria: "Muebles", marca: "IKEA", color: "Blanco", precio: 1800, popularidad: 80, etiqueta: "Popular", imagen: "img/Mueble5.jpg" }, 
+{ nombre: "Mueble", categoria: "Muebles", marca: "IKEA", color: "Madera", precio: 1700, popularidad: 80, etiqueta: "Popular", imagen: "img/Mueble6.jpg" }
+];
+
+let listaFiltrada = [...productos];
+const contenedor = document.getElementById("contenedorProductos");
+let cantidadMostrada = 6;
+
+// --- MOSTRAR PRODUCTOS ---
+function mostrarProductos(arr){
+  contenedor.innerHTML = "";
+  arr.slice(0, cantidadMostrada).forEach(p=>{
+    contenedor.innerHTML += `
+      <div class="col-md-4 col-12">
+        <div class="producto shadow-sm p-2">
+          <span class="etiqueta">${p.etiqueta}</span>
+          <img src="${p.imagen}" alt="${p.nombre}">
+          <div>
+            <h5 class="mt-2">${p.nombre}</h5>
+            <p class="mb-1">${p.marca} - ${p.color}</p>
+            <p class="mb-1"><strong>$${p.precio}</strong></p>
+            <div class="d-flex justify-content-center gap-2">
+              <button class="btn btn-primary btn-sm btn-agregar">Agregar al carrito</button>
+              <button class="btn btn-outline-secondary btn-sm">Ver más</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  activarBotonesCarrito();
+}
+
+// --- FILTROS ---
+function aplicarFiltros(){
+  const cat = document.getElementById("filtrocategoria").value;
+  const marca = document.getElementById("filtromarca").value;
+  const color = document.getElementById("filtrocolor").value;
+  const precio = parseInt(document.getElementById("filtroPrecio").value);
+
+  listaFiltrada = productos.filter(p=>
+    (!cat || p.categoria.toLowerCase() === cat.toLowerCase()) &&
+    (!marca || p.marca.toLowerCase() === marca.toLowerCase()) &&
+    (!color || p.color.toLowerCase() === color.toLowerCase()) &&
+    p.precio <= precio
+  );
+
+  cantidadMostrada = 6;
+  mostrarProductos(listaFiltrada);
+  document.getElementById("btnVerMas").disabled = listaFiltrada.length <= cantidadMostrada;
+  document.getElementById("btnVerMas").textContent = "Ver más productos";
+}
+
+// --- ORDENAR ---
+document.getElementById("ordenar").addEventListener("change", e=>{
+  const val = e.target.value;
+  if(val==="precioAsc") listaFiltrada.sort((a,b)=>a.precio-b.precio);
+  if(val==="precioDesc") listaFiltrada.sort((a,b)=>b.precio-a.precio);
+  if(val==="popularidad") listaFiltrada.sort((a,b)=>b.popularidad-a.popularidad);
+  mostrarProductos(listaFiltrada);
+});
+
+// --- GRID/LISTA ---
+document.getElementById("btnGrid").addEventListener("click",()=>{contenedor.classList.remove("vista-lista"); contenedor.classList.add("vista-grid");});
+document.getElementById("btnLista").addEventListener("click",()=>{contenedor.classList.remove("vista-grid"); contenedor.classList.add("vista-lista");});
+
+// --- VER MÁS PRODUCTOS ---
+document.getElementById("btnVerMas").addEventListener("click",()=>{
+  cantidadMostrada += 3;
+  mostrarProductos(listaFiltrada);
+  if(cantidadMostrada >= listaFiltrada.length){
+    document.getElementById("btnVerMas").disabled = true;
+    document.getElementById("btnVerMas").textContent = "No hay más productos";
+  }
+});
+
+// --- FILTROS EN EVENTOS ---
+document.querySelectorAll("#filtrocategoria,#filtromarca,#filtrocolor").forEach(el=>el.addEventListener("change",aplicarFiltros));
+document.getElementById("filtroPrecio").addEventListener("input",e=>{
+  document.getElementById("precioMax").textContent = e.target.value;
+  aplicarFiltros();
+});
+
+// --- AGREGAR PRODUCTOS AL CARRITO ---
+function activarBotonesCarrito() {
+  const botones = document.querySelectorAll('.btn-agregar');
+  botones.forEach(button => {
+    button.addEventListener('click', () => {
+      const productoCard = button.closest('.producto');
+      const nombre = productoCard.querySelector('h5').textContent;
+      const precio = parseFloat(productoCard.querySelector('p strong').textContent.replace('$',''));
+      const imagen = productoCard.querySelector('img').getAttribute('src');
+
+      const producto = { nombre, precio, cantidad: 1, imagen };
+
+      let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+      const index = carrito.findIndex(p => p.nombre === producto.nombre);
+
+      if (index >= 0) {
+        carrito[index].cantidad += 1;
+      } else {
+        carrito.push(producto);
+      }
+
+      localStorage.setItem('carrito', JSON.stringify(carrito));
+      alert(`✅ "${nombre}" fue agregado al carrito.`);
+      window.location.href = "carrito.html";
+    });
+  });
+}
+
+// --- INICIO ---
+document.addEventListener('DOMContentLoaded', ()=>{
+  mostrarProductos(listaFiltrada);
+});
+</script>
+</body>
+</html>
